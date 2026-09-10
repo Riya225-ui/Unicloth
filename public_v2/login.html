@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - UniCloth</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="header-main" style="border-bottom: 1px solid var(--border); padding: 15px 5%; background: var(--white);">
+    <div class="logo"><a href="index.html"><h1>UniCloth</h1></a></div>
+    <div class="header-icons">
+      <a href="register.html" class="icon-link">Create Account</a>
+    </div>
+  </div>
+
+  <div class="auth-container">
+    <h2 style="margin-bottom: 20px; text-align: center;">Login</h2>
+    <form id="login-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+    </form>
+    <p style="text-align: center; margin-top: 20px;">
+      Don't have an account? <a href="register.html" style="color: var(--secondary);">Register</a>
+    </p>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await apiCall('/auth/login', 'POST', { email, password });
+        localStorage.setItem('unicloth_token', res.token);
+        localStorage.setItem('unicloth_user', JSON.stringify(res.user));
+        if (res.user.role === 'admin') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'index.html';
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+  </script>
+</body>
+</html>

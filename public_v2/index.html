@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCloth | Premium Clothing Brand</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="top-bar">
+    Free Shipping on Orders Over ৳2000 | 100% Original Products
+  </div>
+
+  <div class="header-main">
+    <div class="logo">
+      <a href="index.html"><h1>UniCloth</h1></a>
+    </div>
+    
+    <div class="search-container">
+      <form onsubmit="handleSearch(event)">
+        <input type="text" id="global-search" placeholder="Search for products, categories...">
+        <button type="submit">Search</button>
+      </form>
+    </div>
+
+    <div class="header-icons" id="auth-links">
+      <a href="login.html" class="icon-link">👤 Account</a>
+    </div>
+    <div class="header-icons" style="margin-left: 20px;">
+      <a href="products.html" class="icon-link">
+        ♡ Wishlist
+        <span class="badge-count" id="wish-count">0</span>
+      </a>
+      <a href="cart.html" class="icon-link">
+        🛒 Cart
+        <span class="badge-count" id="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+
+  <nav class="main-nav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">New Arrivals</a></li>
+      <li><a href="products.html?category=men">Men</a></li>
+      <li><a href="products.html?category=women">Women</a></li>
+      <li><a href="products.html?badge=sale" style="color: var(--danger);">Sale</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h2>Festive Collection</h2>
+      <p>Explore the finest ethnic and contemporary wear for the season.</p>
+      <a href="products.html" class="btn btn-primary">Discover Now</a>
+    </div>
+  </section>
+
+  <section class="section-padding">
+    <div class="categories-grid">
+      <a href="products.html?category=men" class="category-box">
+        <img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800" alt="Men">
+        <div class="category-label">Shop Men</div>
+      </a>
+      <a href="products.html?category=women" class="category-box">
+        <img src="https://images.unsplash.com/photo-1584273143981-41c073dfe8f8?w=800" alt="Women">
+        <div class="category-label">Shop Women</div>
+      </a>
+      <a href="products.html?badge=new" class="category-box">
+        <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=800" alt="New Arrivals">
+        <div class="category-label">New Arrivals</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section-padding" style="background: var(--light);">
+    <h2 class="section-title">Trending Now</h2>
+    <div class="product-grid" id="trending-products"></div>
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="products.html" class="btn btn-outline">View All Products</a>
+    </div>
+  </section>
+
+  <div class="promo-banner">
+    <div class="promo-text">
+      <h3>Exclusive Member Discount</h3>
+      <p>Register today and get 10% off on your first purchase.</p>
+    </div>
+    <a href="register.html" class="btn btn-primary">Join Now</a>
+  </div>
+
+  <section class="newsletter">
+    <h3>Join Our Newsletter</h3>
+    <p>Subscribe to receive updates, access to exclusive deals, and more.</p>
+    <form onsubmit="handleNewsletter(event)">
+      <input type="email" id="newsletter-input" placeholder="Enter your email address" required>
+      <button type="submit">Subscribe</button>
+    </form>
+  </section>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h1 style="color:white; font-size: 24px; margin-bottom: 20px; text-transform:uppercase;">UniCloth</h1>
+        <p>Premium Bangladeshi clothing brand delivering quality and tradition directly to your doorstep.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="products.html?category=men">Men's Collection</a></li>
+          <li><a href="products.html?category=women">Women's Collection</a></li>
+          <li><a href="products.html?badge=sale">Special Offers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Customer Care</h4>
+        <ul>
+          <li><a href="#">Track Order</a></li>
+          <li><a href="#">Shipping & Returns</a></li>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li>Email: support@unicloth.com</li>
+          <li>Phone: +880 1710 000000</li>
+          <li>Address: Banani, Dhaka, Bangladesh</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 UniCloth. All Rights Reserved.</p>
+      <div class="payment-methods">
+        <span>VISA</span>
+        <span>MASTERCARD</span>
+        <span>BKASH</span>
+        <span>NAGAD</span>
+        <span>COD</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    async function loadTrendingProducts() {
+      try {
+        const products = await apiCall('/products?limit=8');
+        const container = document.getElementById('trending-products');
+        container.innerHTML = products.map(p => `
+          <div class="product-card">
+            <div class="product-image-container" style="cursor:pointer;" onclick="window.location.href='product-detail.html?id=${p.id}'">
+              ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
+              <img src="${p.image_url}" alt="${p.name}">
+              <div class="product-actions" onclick="event.stopPropagation()">
+                <button class="action-btn" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${p.image_url}')">Add to Cart</button>
+                <button class="action-btn wishlist" onclick="toggleWishlist(${p.id}, '${p.name.replace(/'/g, "\\'")}')">♡</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <div class="product-category">${p.category}</div>
+              <h3 class="product-title" style="cursor:pointer;" onclick="window.location.href='product-detail.html?id=${p.id}'">${p.name}</h3>
+              <div class="product-price">
+                ৳${p.price} 
+                ${p.old_price ? `<span class="old-price">৳${p.old_price}</span>` : ''}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {}
+    }
+    document.addEventListener('DOMContentLoaded', loadTrendingProducts);
+  </script>
+</body>
+</html>

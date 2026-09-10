@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details | UniCloth</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="top-bar">Free Shipping on Orders Over ৳2000 | 100% Original Products</div>
+  <div class="header-main">
+    <div class="logo"><a href="index.html"><h1>UniCloth</h1></a></div>
+    <div class="search-container">
+      <form onsubmit="handleSearch(event)">
+        <input type="text" id="global-search" placeholder="Search for products, categories...">
+        <button type="submit">Search</button>
+      </form>
+    </div>
+    <div class="header-icons" id="auth-links"></div>
+    <div class="header-icons" style="margin-left: 20px;">
+      <a href="products.html" class="icon-link">♡ Wishlist <span class="badge-count" id="wish-count">0</span></a>
+      <a href="cart.html" class="icon-link">🛒 Cart <span class="badge-count" id="cart-count">0</span></a>
+    </div>
+  </div>
+  
+  <nav class="main-nav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">New Arrivals</a></li>
+      <li><a href="products.html?category=men">Men</a></li>
+      <li><a href="products.html?category=women">Women</a></li>
+    </ul>
+  </nav>
+
+  <div class="section-padding" style="display: flex; gap: 50px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 300px;">
+      <img id="detail-img" style="width: 100%; height: auto; object-fit: cover; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);" src="" alt="Product">
+    </div>
+    
+    <div style="flex: 1; min-width: 300px;">
+      <div style="color: var(--text-light); text-transform: uppercase; font-size: 12px; margin-bottom: 10px;" id="detail-cat"></div>
+      <h1 id="detail-name" style="font-size: 28px; margin-bottom: 15px; font-weight: 600;">Loading...</h1>
+      
+      <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+        <span id="detail-price" style="font-size: 24px; font-weight: 700; color: var(--primary);"></span>
+        <span id="detail-old-price" style="font-size: 16px; text-decoration: line-through; color: var(--text-light);"></span>
+      </div>
+
+      <p id="detail-desc" style="color: var(--text); line-height: 1.8; margin-bottom: 30px;"></p>
+
+      <div style="margin-bottom: 30px;">
+        <h4 style="margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Select Size</h4>
+        <div style="display: flex; gap: 10px;" id="size-selector">
+          <label style="border: 1px solid var(--border); padding: 8px 15px; cursor: pointer; text-transform: uppercase; font-weight: 500;">
+            <input type="radio" name="size" value="S" checked style="display: none;"> S
+          </label>
+          <label style="border: 1px solid var(--border); padding: 8px 15px; cursor: pointer; text-transform: uppercase; font-weight: 500;">
+            <input type="radio" name="size" value="M" style="display: none;"> M
+          </label>
+          <label style="border: 1px solid var(--border); padding: 8px 15px; cursor: pointer; text-transform: uppercase; font-weight: 500;">
+            <input type="radio" name="size" value="L" style="display: none;"> L
+          </label>
+          <label style="border: 1px solid var(--border); padding: 8px 15px; cursor: pointer; text-transform: uppercase; font-weight: 500;">
+            <input type="radio" name="size" value="XL" style="display: none;"> XL
+          </label>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 15px;">
+        <button id="add-to-cart-btn" class="btn btn-primary" style="flex: 1; padding: 15px; font-size: 16px;">Add to Cart</button>
+        <button id="wishlist-btn" class="btn btn-outline" style="padding: 15px 25px; font-size: 18px;">♡</button>
+      </div>
+
+      <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; font-size: 13px; color: var(--text-light);">
+        <p style="margin-bottom: 5px;">✓ Secure online payments</p>
+        <p style="margin-bottom: 5px;">✓ Easy 7-day return policy</p>
+        <p>✓ Fast delivery across Bangladesh</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="section-padding" style="background: var(--light);">
+    <h2 class="section-title" style="font-size: 20px;">You May Also Like</h2>
+    <div class="product-grid" id="related-products"></div>
+  </section>
+
+  <footer>
+    <div class="footer-bottom">
+      <p>&copy; 2024 UniCloth. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+
+    async function loadProductDetails() {
+      if (!productId) return;
+      try {
+        const product = await apiCall(`/products/${productId}`);
+        document.title = `${product.name} | UniCloth`;
+        document.getElementById('detail-img').src = product.image_url;
+        document.getElementById('detail-name').innerText = product.name;
+        document.getElementById('detail-cat').innerText = product.category;
+        document.getElementById('detail-price').innerText = `৳${product.price}`;
+        if (product.old_price) {
+          document.getElementById('detail-old-price').innerText = `৳${product.old_price}`;
+        }
+        document.getElementById('detail-desc').innerText = product.description;
+
+        const sizeLabels = document.querySelectorAll('#size-selector label');
+        sizeLabels.forEach(lbl => {
+          lbl.addEventListener('click', () => {
+            sizeLabels.forEach(l => {
+              l.style.background = 'white';
+              l.style.color = 'var(--text)';
+              l.style.borderColor = 'var(--border)';
+            });
+            lbl.style.background = 'var(--primary)';
+            lbl.style.color = 'white';
+            lbl.style.borderColor = 'var(--primary)';
+            lbl.querySelector('input').checked = true;
+          });
+        });
+        sizeLabels[1].click();
+
+        document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+          const size = document.querySelector('input[name="size"]:checked').value;
+          addDetailedToCart(product.id, product.name, product.price, product.image_url, size);
+        });
+
+        document.getElementById('wishlist-btn').addEventListener('click', () => {
+          toggleWishlist(product.id, product.name);
+        });
+
+        loadRelated(product.category);
+      } catch (err) {
+        document.getElementById('detail-name').innerText = 'Product not found';
+      }
+    }
+
+    function addDetailedToCart(id, name, price, image, size) {
+      let cart = JSON.parse(localStorage.getItem('unicloth_cart') || '[]');
+      const existing = cart.find(i => i.product_id === id && i.size === size);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ product_id: id, name, price, image, qty: 1, size: size });
+      }
+      localStorage.setItem('unicloth_cart', JSON.stringify(cart));
+      updateCartBadge();
+      showToast(`${name} (Size: ${size}) added to Cart!`);
+    }
+
+    async function loadRelated(category) {
+      try {
+        const products = await apiCall(`/products?category=${category}&limit=4`);
+        const container = document.getElementById('related-products');
+        container.innerHTML = products.filter(p => p.id != productId).map(p => `
+          <div class="product-card">
+            <div class="product-image-container">
+              <img src="${p.image_url}" alt="${p.name}" style="cursor:pointer;" onclick="window.location.href='product-detail.html?id=${p.id}'">
+            </div>
+            <div class="product-info">
+              <h3 class="product-title" style="cursor:pointer;" onclick="window.location.href='product-detail.html?id=${p.id}'">${p.name}</h3>
+              <div class="product-price">৳${p.price}</div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProductDetails);
+  </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop | UniCloth</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="top-bar">Free Shipping on Orders Over ৳2000 | 100% Original Products</div>
+  <div class="header-main">
+    <div class="logo"><a href="index.html"><h1>UniCloth</h1></a></div>
+    <div class="search-container">
+      <form onsubmit="handleSearch(event)">
+        <input type="text" id="global-search" placeholder="Search for products, categories...">
+        <button type="submit">Search</button>
+      </form>
+    </div>
+    <div class="header-icons" id="auth-links"><a href="login.html" class="icon-link">👤 Account</a></div>
+    <div class="header-icons" style="margin-left: 20px;">
+      <a href="products.html" class="icon-link">♡ Wishlist <span class="badge-count" id="wish-count">0</span></a>
+      <a href="cart.html" class="icon-link">🛒 Cart <span class="badge-count" id="cart-count">0</span></a>
+    </div>
+  </div>
+
+  <nav class="main-nav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">New Arrivals</a></li>
+      <li><a href="products.html?category=men">Men</a></li>
+      <li><a href="products.html?category=women">Women</a></li>
+      <li><a href="products.html?badge=sale" style="color: var(--danger);">Sale</a></li>
+    </ul>
+  </nav>
+
+  <div class="shop-container">
+    <aside class="sidebar">
+      <div class="sidebar-block">
+        <h4>Category</h4>
+        <label class="filter-option"><input type="radio" name="cat" value="" checked onclick="applyFilters()"> All</label>
+        <label class="filter-option"><input type="radio" name="cat" value="men" onclick="applyFilters()"> Men</label>
+        <label class="filter-option"><input type="radio" name="cat" value="women" onclick="applyFilters()"> Women</label>
+      </div>
+      <div class="sidebar-block">
+        <h4>Price Range</h4>
+        <div class="price-inputs">
+          <input type="number" id="min-price" placeholder="Min ৳">
+          <input type="number" id="max-price" placeholder="Max ৳">
+        </div>
+        <button class="btn btn-outline" style="width:100%; padding:8px;" onclick="applyFilters()">Apply Filter</button>
+      </div>
+    </aside>
+
+    <div>
+      <div class="shop-header">
+        <h2 style="font-size: 20px; font-weight: 500;" id="search-title">All Products</h2>
+        <select class="sort-select" id="sort" onchange="applyFilters()">
+          <option value="">Sort by: Featured</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name">Name: A to Z</option>
+          <option value="rating">Top Rated</option>
+        </select>
+      </div>
+      <div class="product-grid" id="shop-products"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-bottom">
+      <p>&copy; 2024 UniCloth. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let currentSearch = getQueryParam('search') || '';
+    let currentBadge = getQueryParam('badge') || '';
+    
+    if (currentSearch) {
+      document.getElementById('search-title').innerText = `Search results for "${currentSearch}"`;
+      document.getElementById('global-search').value = currentSearch;
+    }
+    
+    const catParam = getQueryParam('category');
+    if (catParam) {
+      document.querySelector(`input[name="cat"][value="${catParam}"]`).checked = true;
+    }
+
+    async function applyFilters() {
+      const cat = document.querySelector('input[name="cat"]:checked').value;
+      const minP = document.getElementById('min-price').value;
+      const maxP = document.getElementById('max-price').value;
+      const sort = document.getElementById('sort').value;
+      
+      let url = '/products?';
+      if (cat) url += `category=${cat}&`;
+      if (currentSearch) url += `search=${encodeURIComponent(currentSearch)}&`;
+      if (currentBadge) url += `badge=${currentBadge}&`;
+      if (minP) url += `minPrice=${minP}&`;
+      if (maxP) url += `maxPrice=${maxP}&`;
+      if (sort) url += `sort=${sort}&`;
+
+      try {
+        const products = await apiCall(url);
+        const container = document.getElementById('shop-products');
+        if (products.length === 0) {
+           container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 50px;">No products found matching your criteria.</p>';
+           return;
+        }
+        container.innerHTML = products.map(p => `
+          <div class="product-card">
+            <div class="product-image-container" style="cursor:pointer;" onclick="window.location.href='product-detail.html?id=${p.id}'">
+              ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
+              <img src="${p.image_url}" alt="${p.name}">
+              <div class="product-actions" onclick="event.stopPropagation()">
+                <button class="action-btn" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${p.image_url}')">Add to Cart</button>
+                <button class="action-btn wishlist" onclick="toggleWishlist(${p.id}, '${p.name.replace(/'/g, "\\'")}')">♡</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <div class="product-category">${p.category}</div>
+              <h3 class="product-title" style="cursor:pointer;" onclick="window.location.href='product-detail.html?id=${p.id}'">${p.name}</h3>
+              <div class="product-price">
+                ৳${p.price} 
+                ${p.old_price ? `<span class="old-price">৳${p.old_price}</span>` : ''}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {}
+    }
+    document.addEventListener('DOMContentLoaded', applyFilters);
+  </script>
+</body>
+</html>

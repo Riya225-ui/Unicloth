@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account | UniCloth</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background: var(--light);">
+
+  <div class="top-bar">Free Shipping on Orders Over ৳2000</div>
+  <div class="header-main" style="background: var(--white); border-bottom: 1px solid var(--border);">
+    <div class="logo"><a href="index.html"><h1>UniCloth</h1></a></div>
+    <div class="header-icons" id="auth-links"></div>
+  </div>
+
+  <div class="section-padding" style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 250px 1fr; gap: 40px;">
+    
+    <div style="background: var(--white); padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); align-self: start;">
+      <h3 style="margin-bottom: 20px; font-size: 18px; text-transform: uppercase;">Dashboard</h3>
+      <ul style="line-height: 2.5;">
+        <li><a href="#" style="color: var(--accent); font-weight: 500;">My Profile</a></li>
+        <li><a href="#orders">Order History</a></li>
+        <li><a href="products.html">Shop More</a></li>
+        <li><a href="#" onclick="logout()" style="color: var(--danger);">Logout</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div style="background: var(--white); padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); margin-bottom: 40px;">
+        <h2 style="font-size: 22px; margin-bottom: 20px; text-transform: uppercase;">Profile Information</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" id="profile-info">
+          <div><label style="color:var(--text-light); font-size:12px; text-transform:uppercase;">Name</label><div id="p-name" style="font-weight:500;">Loading...</div></div>
+          <div><label style="color:var(--text-light); font-size:12px; text-transform:uppercase;">Email</label><div id="p-email" style="font-weight:500;"></div></div>
+          <div><label style="color:var(--text-light); font-size:12px; text-transform:uppercase;">Phone</label><div id="p-phone" style="font-weight:500;"></div></div>
+        </div>
+      </div>
+
+      <div id="orders" style="background: var(--white); padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+        <h2 style="font-size: 22px; margin-bottom: 20px; text-transform: uppercase;">Order History</h2>
+        <div style="overflow-x: auto;">
+          <table class="cart-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="orders-body">
+              <tr><td colspan="5">Loading orders...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    async function loadDashboard() {
+      const token = localStorage.getItem('unicloth_token');
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        const profile = await apiCall('/auth/profile');
+        document.getElementById('p-name').innerText = profile.name;
+        document.getElementById('p-email').innerText = profile.email;
+        document.getElementById('p-phone').innerText = profile.phone || 'Not provided';
+      } catch (err) {}
+
+      try {
+        const orders = await apiCall('/orders/my-orders');
+        const tbody = document.getElementById('orders-body');
+        if (orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No orders found.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = orders.map(o => `
+          <tr>
+            <td style="font-weight:500;">#${o.id}</td>
+            <td style="color:var(--text-light); font-size:14px;">${new Date(o.created_at).toLocaleDateString()}</td>
+            <td style="font-size:14px;">${o.product_names || 'Items'}</td>
+            <td style="font-weight:600;">৳${o.total_amount + o.delivery_charge}</td>
+            <td>
+              <span style="background: ${o.status==='pending'?'#f39c12':(o.status==='confirmed'?'#3498db':'#2ecc71')}; color:white; padding:4px 10px; border-radius:3px; font-size:12px; text-transform:uppercase;">
+                ${o.status}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+  </script>
+</body>
+</html>

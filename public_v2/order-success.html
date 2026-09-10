@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Success - UniCloth</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="logo"><a href="index.html"><h1>UniCloth</h1></a></div>
+    <nav id="main-nav">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Shop</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="auth-container" style="text-align: center; margin-top: 100px;">
+    <div style="font-size: 60px; color: #2ECC71; margin-bottom: 20px;">✓</div>
+    <h2 style="margin-bottom: 20px;">Order Placed Successfully!</h2>
+    <p style="margin-bottom: 10px;">Thank you for shopping with UniCloth.</p>
+    <p style="margin-bottom: 30px; font-weight: bold;">Order ID: <span id="order-id"></span></p>
+    
+    <a href="products.html" class="btn btn-primary">Continue Shopping</a>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const orderId = getQueryParam('orderId');
+      if(orderId) {
+        document.getElementById('order-id').innerText = '#' + orderId;
+      }
+    });
+  </script>
+</body>
+</html>
