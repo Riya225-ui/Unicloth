@@ -6,20 +6,29 @@ const pool = mysql.createPool({
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'unicloth_db',
+  port: process.env.DB_PORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
 
+const dbName = process.env.DB_NAME || 'unicloth_db';
+
 async function initDB() {
   try {
-    const tempConn = await mysql.createConnection({
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASSWORD || ''
-    });
-    await tempConn.query("CREATE DATABASE IF NOT EXISTS unicloth_db");
-    await tempConn.end();
+    // Try to create database if it doesn't exist (mostly for local development)
+    try {
+      const tempConn = await mysql.createConnection({
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        port: process.env.DB_PORT || 3306
+      });
+      await tempConn.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
+      await tempConn.end();
+    } catch (createErr) {
+      console.log("Skipping database creation (usually normal for cloud databases).");
+    }
 
     const conn = await pool.getConnection();
 
