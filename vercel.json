@@ -1,9 +1,14 @@
 {
-  "functions": {
-    "server/server.js": {
-      "includeFiles": "public_v2/**"
+  "version": 2,
+  "builds": [
+    {
+      "src": "server/server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": "public_v2/**"
+      }
     }
-  },
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
