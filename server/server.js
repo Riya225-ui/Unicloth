@@ -26,6 +26,7 @@ app.use('/public_v2', express.static(path.join(__dirname, '../public_v2'), {
   }
 }));
 
+app.get('/api/test', (req,res) => res.send('VERCEL DEPLOYMENT WORKING ' + process.env.DB_HOST));
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
