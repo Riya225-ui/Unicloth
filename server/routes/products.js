@@ -46,7 +46,7 @@ router.get('/', async (req, res) => {
     res.json(products);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Database error' });
+    res.status(500).json({ error: err.message, stack: err.stack, env: process.env.DB_HOST });
   }
 });
 
@@ -56,7 +56,7 @@ router.get('/:id', async (req, res) => {
     if (products.length === 0) return res.status(404).json({ error: 'Product not found' });
     res.json(products[0]);
   } catch (err) {
-    res.status(500).json({ error: 'Database error' });
+    res.status(500).json({ error: err.message, stack: err.stack, env: process.env.DB_HOST });
   }
 });
 
