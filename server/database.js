@@ -1,7 +1,7 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-const pool = mysql.createPool({
+const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
@@ -10,7 +10,13 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
-});
+};
+
+if (process.env.DB_HOST && process.env.DB_HOST !== 'localhost') {
+  dbConfig.ssl = { rejectUnauthorized: false };
+}
+
+const pool = mysql.createPool(dbConfig);
 
 const dbName = process.env.DB_NAME || 'unicloth_db';
 
@@ -18,12 +24,16 @@ async function initDB() {
   try {
     // Try to create database if it doesn't exist (mostly for local development)
     try {
-      const tempConn = await mysql.createConnection({
+      const tempConfig = {
         host: process.env.DB_HOST || 'localhost',
         user: process.env.DB_USER || 'root',
         password: process.env.DB_PASSWORD || '',
         port: process.env.DB_PORT || 3306
-      });
+      };
+      if (process.env.DB_HOST && process.env.DB_HOST !== 'localhost') {
+        tempConfig.ssl = { rejectUnauthorized: false };
+      }
+      const tempConn = await mysql.createConnection(tempConfig);
       await tempConn.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
       await tempConn.end();
     } catch (createErr) {
